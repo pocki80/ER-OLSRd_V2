@@ -1,0 +1,7 @@
+Package: 0xFF-ER-OLSRd_V2
+Version: 0.1
+Section: base
+Priority: optional
+Architecture: mipsel
+Maintainer: Christian Pock <pocki@pocki.at>
+Description: EDGERouter OLSRd_V2 installation
