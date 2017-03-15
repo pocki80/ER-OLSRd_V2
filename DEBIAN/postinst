@@ -5,7 +5,8 @@ olsrd2dir="/config/olsrd2/"
 log="/var/log/olsrd2.log"
 
 # chmod olsrd2 binary
-chmod 755 $olsrd2dir""olsrd
+chmod 755 $olsrd2dir""olsrd2
+chmod 755 $olsrd2dir""startolsrd2.sh
 
 # establish default config file if config not already there
 file="olsrd2.conf"
