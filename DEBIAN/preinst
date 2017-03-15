@@ -9,20 +9,16 @@ ps aux | grep olsrd2 | grep olsrd2.conf | grep -v grep | awk '{print $2;}' | xar
 sleep 1
 rm -f /var/lock/olsrd2
 
-# migrate files from manual installation locations
+# migrate config file from manual installation location
 file="olsrd2.conf"
 if [ ! -f $olsrd2dir$file ] && [ -f "/home/ubnt/"$file ]; then
       mv "/home/ubnt/"$file $olsrd2dir$file >>$log
 fi
 
-file="olsrd"
-if [ ! -f $olsrd2dir$file ] && [ -f "/home/ubnt/"$file ]; then
-      mv "/home/ubnt/"$file $olsrd2dir$file >>$log
-fi
-
-# remove old start script with old paths
-if [ -f "/home/ubnt/startolsrd2.sh" ]; then
-      rm "/home/ubnt/startolsrd2.sh" >>$log
-fi
+# remove old files from manual installation locations
+[ -f "/home/ubnt/startolsrd2.sh" ] && rm "/home/ubnt/startolsrd2.sh" >>$log
+[ -f "/home/ubnt/olsrd2" ] && rm "/home/ubnt/olsrd2" >>$log
+[ -f "/home/ubnt/olsrd2.conf" ] && rm "/home/ubnt/olsrd2.conf" >>$log
+[ -d "/home/ubnt/wwwolsrd2" ] && rm -Rf "/home/ubnt/wwwolsrd2" >>$log
 
 exit 0
