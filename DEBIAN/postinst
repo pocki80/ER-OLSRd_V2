@@ -2,7 +2,7 @@
 #postinstall
 
 olsrd2dir="/config/olsrd2/"
-log="/var/log/olsrd2.log"
+log="/var/log/0xffolsrd2.log"
 
 # chmod olsrd2 binary
 chmod 755 $olsrd2dir""olsrd2
