@@ -17,6 +17,7 @@ fi
 # fire up olsrd2 daemon
 if [ -f $olsrd2dir"olsrd2.conf" ]; then
     $olsrd2dir""olsrd2 -l $olsrd2dir"olsrd2.conf" >>$log 2>>$log
+    cp $olsrd2dir""startolsrd2.sh /config/scripts/post-config.d/startolsrd2.sh
 else
     echo "daemon not started due to missing olsrd2.conf file" >>$log
 fi
