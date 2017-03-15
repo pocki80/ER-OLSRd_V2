@@ -2,7 +2,7 @@
 #preinstall
 
 olsrd2dir="/config/olsrd2/"
-log="/var/log/olsrd2.log"
+log="/var/log/0xffolsrd2.log"
 
 # stop running olsrd2 daemon
 ps aux | grep olsrd2 | grep olsrd2.conf | grep -v grep | awk '{print $2;}' | xargs kill >>$log 2>>$log
@@ -22,4 +22,3 @@ fi
 [ -d "/home/ubnt/wwwolsrd2" ] && rm -Rf "/home/ubnt/wwwolsrd2" >>$log
 
 exit 0
-
