@@ -1,4 +1,28 @@
 #!/bin/sh
 #preinstall
 
+olsrd2dir="/config/olsrd2/"
+log="/var/log/olsrd2.log"
+
+# stop running olsrd2 daemon
+ps aux | grep olsrd2 | grep olsrd2.conf | grep -v grep | awk '{print $2;}' | xargs kill >>$log 2>>$log
+sleep 1
+rm -f /var/lock/olsrd2
+
+# migrate files from manual installation locations
+file="olsrd2.conf"
+if [ ! -f $olsrd2dir$file ] && [ -f "/home/ubnt/"$file ]; then
+      mv "/home/ubnt/"$file $olsrd2dir$file >>$log
+fi
+
+file="olsrd"
+if [ ! -f $olsrd2dir$file ] && [ -f "/home/ubnt/"$file ]; then
+      mv "/home/ubnt/"$file $olsrd2dir$file >>$log
+fi
+
+# remove old start script with old paths
+if [ -f "/home/ubnt/startolsrd2.sh" ]; then
+      rm "/home/ubnt/startolsrd2.sh" >>$log
+fi
+
 exit 0
