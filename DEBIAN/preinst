@@ -5,7 +5,7 @@ olsrd2dir="/config/olsrd2/"
 log="/var/log/0xffolsrd2.log"
 
 # stop running olsrd2 daemon
-ps aux | grep olsrd2 | grep olsrd2.conf | grep -v grep | awk '{print $2;}' | xargs kill >>$log 2>>$log
+ps aux | grep "olsrd2 " | grep olsrd2.conf | grep -v grep | awk '{print $2;}' | xargs kill >>$log 2>>$log
 sleep 1
 rm -f /var/lock/olsrd2
 
