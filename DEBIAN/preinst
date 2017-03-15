@@ -22,3 +22,4 @@ fi
 [ -d "/home/ubnt/wwwolsrd2" ] && rm -Rf "/home/ubnt/wwwolsrd2" >>$log
 
 exit 0
+
