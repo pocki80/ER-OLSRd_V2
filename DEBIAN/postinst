@@ -1,4 +1,20 @@
 #!/bin/sh
 #postinstall
 
+olsrd2dir="/config/olsrd2/"
+log="/var/log/olsrd2.log"
+
+# chmod olsrd2 binary
+chmod 755 $olsrd2dir""olsrd
+
+# establish default config file if config not already there
+file="olsrd2.conf"
+if [ ! -f $olsrd2dir$file ] && [ -f $olsrd2dir"olsrd2_default.conf" ]; then
+      cp $olsrd2dir"olsrd2_default.conf" $olsrd2dir$file >>$log
+fi
+
+
+# fire up olsrd2 daemon
+$olsrd2dir""olsrd2 -l $olsrd2dir""olsrd2.conf
+
 exit 0
