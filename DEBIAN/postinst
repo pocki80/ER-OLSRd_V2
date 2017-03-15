@@ -14,7 +14,6 @@ if [ ! -f $olsrd2dir$file ] && [ -f $olsrd2dir"olsrd2_default.conf" ]; then
       cp $olsrd2dir"olsrd2_default.conf" $olsrd2dir$file >>$log
 fi
 
-
 # fire up olsrd2 daemon
 $olsrd2dir""olsrd2 -l $olsrd2dir""olsrd2.conf
 
