@@ -13,6 +13,7 @@ rm -f /var/lock/olsrd2
 file="olsrd2.conf"
 if [ ! -f $olsrd2dir$file ] && [ -f "/home/ubnt/"$file ]; then
       mv "/home/ubnt/"$file $olsrd2dir$file >>$log
+      chown ubnt:1000 $olsrd2dir$file >>$log
 fi
 
 # remove old files from manual installation locations
@@ -20,5 +21,5 @@ fi
 [ -f "/home/ubnt/olsrd2" ] && rm "/home/ubnt/olsrd2" >>$log
 [ -f "/home/ubnt/olsrd2.conf" ] && rm "/home/ubnt/olsrd2.conf" >>$log
 [ -d "/home/ubnt/wwwolsrd2" ] && rm -Rf "/home/ubnt/wwwolsrd2" >>$log
- 
+
 exit 0
