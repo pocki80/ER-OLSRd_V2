@@ -10,9 +10,12 @@ sleep 1
 rm -f /var/lock/olsrd2
 
 # migrate config file from manual installation location
-file="olsrd2.conf"
-if [ ! -f $olsrd2dir$file ] && [ -f "/home/ubnt/"$file ]; then
-      mv "/home/ubnt/"$file $olsrd2dir$file >>$log
+if [ ! -d $olsrd2dir$file ]; then
+      mkdir $olsrd2dir >>$log
+fi
+
+if [ ! -f $olsrd2dir$file ] && [ -f "/home/ubnt/olsrd2.conf" ]; then
+      mv /home/ubnt/olsrd2.conf $olsrd2dir$file >>$log
       chown ubnt:1000 $olsrd2dir$file >>$log
 fi
 
