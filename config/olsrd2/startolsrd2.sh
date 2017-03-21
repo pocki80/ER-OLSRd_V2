@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "Killing running deamons..."
+echo "Killing running olsrd2 deamon..."
 ps aux | grep "/config/olsrd2/olsrd2 -l /config/olsrd2/olsrd2.conf" | grep -v grep | awk '{print $2;}' | xargs kill 2>/dev/null
 sleep 1
 rm -f /var/lock/olsrd2
