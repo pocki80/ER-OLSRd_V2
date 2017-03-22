@@ -4,7 +4,9 @@
 olsrd2dir="/config/olsrd2/"
 log="/var/log/0xffolsrd2.log"
 
+#enable autostart
 chmod 755 $olsrd2dir""startolsrd2.sh
+cp $olsrd2dir""startolsrd2.sh /config/scripts/post-config.d/startolsrd2.sh >>$log 2>>$log
 
 # establish default config file if config not already there
 file="olsrd2.conf"
