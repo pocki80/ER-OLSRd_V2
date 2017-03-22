@@ -4,25 +4,4 @@
 olsrd2dir="/config/olsrd2/"
 log="/var/log/0xffolsrd2.log"
 
-# stop running olsrd2 daemon
-ps aux | grep "olsrd2 " | grep olsrd2.conf | grep -v grep | awk '{print $2;}' | xargs kill >>$log 2>>$log
-sleep 1
-rm -f /var/lock/olsrd2
-
-# migrate config file from manual installation location
-if [ ! -d $olsrd2dir$file ]; then
-      mkdir $olsrd2dir >>$log
-fi
-
-if [ ! -f $olsrd2dir$file ] && [ -f "/home/ubnt/olsrd2.conf" ]; then
-      mv /home/ubnt/olsrd2.conf $olsrd2dir$file >>$log
-      chown ubnt:1000 $olsrd2dir$file >>$log
-fi
-
-# remove old files from manual installation locations
-[ -f "/home/ubnt/startolsrd2.sh" ] && rm "/home/ubnt/startolsrd2.sh" >>$log
-[ -f "/home/ubnt/olsrd2" ] && rm "/home/ubnt/olsrd2" >>$log
-[ -f "/home/ubnt/olsrd2.conf" ] && rm "/home/ubnt/olsrd2.conf" >>$log
-[ -d "/home/ubnt/wwwolsrd2" ] && rm -Rf "/home/ubnt/wwwolsrd2" >>$log
-
 exit 0
