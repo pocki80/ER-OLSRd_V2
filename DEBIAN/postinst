@@ -21,7 +21,7 @@ if [ ! -f $olsrd2dir"olsrd2" ]; then
     chmod 755 $olsrd2dir""olsrd2 >>$log 2>>$log
     #fire up olsrd2 daemon
     $olsrd2dir""olsrd2 -l $olsrd2dir"olsrd2.conf" >>$log 2>>$log
-elif [ $(sha1sum olsrd2 | awk {'print $1'}) !== $(sha1sum olsrd2_inst | awk {'print $1'}) ]; then
+elif [ $(sha1sum olsrd2 | awk {'print $1'}) != $(sha1sum olsrd2_inst | awk {'print $1'}) ]; then
     #package contains new/changed olsrd2 binary
     cp $olsrd2dir"olsrd2_inst" $olsrd2dir"olsrd2"  >>$log 2>>$log
     chmod 755 $olsrd2dir""olsrd2  >>$log 2>>$log
