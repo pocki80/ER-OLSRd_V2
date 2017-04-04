@@ -3,15 +3,18 @@
 
 olsrd2dir="/config/olsrd2/"
 log="/var/log/0xffolsrd2.log"
+configfile="olsrd2.conf"
 
-#enable autostart
+#enable autostart - only on "plain install" and olsr-v1/v6 is not running
+olsr1v6running=$(ps aux | grep -E "olsrd6|olsrdv6" | grep -v grep | wc -l)
 chmod 755 $olsrd2dir""startolsrd2.sh
-cp $olsrd2dir""startolsrd2.sh /config/scripts/post-config.d/startolsrd2.sh >>$log 2>>$log
+if [ ! -f $olsrd2dir$configfile ] && [ "$olsr1v6running" == "0" ]; then
+    cp $olsrd2dir""startolsrd2.sh /config/scripts/post-config.d/startolsrd2.sh >>$log 2>>$log
+fi
 
-# establish default config file if config not already there
-file="olsrd2.conf"
-if [ ! -f $olsrd2dir$file ] && [ -f $olsrd2dir"olsrd2_default.conf" ]; then
-    cp $olsrd2dir"olsrd2_default.conf" $olsrd2dir$file >>$log 2>>$log
+# establish default configfile if config not already there
+if [ ! -f $olsrd2dir$configfile ] && [ -f $olsrd2dir"olsrd2_default.conf" ]; then
+    cp $olsrd2dir"olsrd2_default.conf" $olsrd2dir$configfile >>$log 2>>$log
 fi
 
 #check for olsrd2 version
