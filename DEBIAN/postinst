@@ -9,11 +9,11 @@ configfile="olsrd2.conf"
 if [ ! -f $olsrd2dir$configfile ] && [ ! -f $olsrd2dir"olsrd2" ] && [ ! -f /config/scripts/post-config.d/startolsrd2.sh ]; then
     if [ $(grep -E "^    name-server 2001:4860:4860::8888" /config/config.boot | wc -l) == "0" ]; then
         docommands="1"
-        executecmd1="set system name-server '2001:4860:4860::8888"
+        executecmd1="set system name-server '2001:4860:4860::8888'"
     fi
     if [ $(grep -E "^    name-server 2001:4860:4860::8844" /config/config.boot | wc -l) == "0" ]; then
         docommands="1"
-        executecmd2="set system name-server '2001:4860:4860::8844"
+        executecmd2="set system name-server '2001:4860:4860::8844'"
     fi
     if [ "$docommands" ]; then
         echo "Adding Google v6-DNS servers to setup..." >>$log
