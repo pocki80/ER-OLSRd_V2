@@ -68,7 +68,7 @@ elif [ $(sha1sum $olsrd2dir""olsrd2 | awk {'print $1'}) != $(sha1sum $olsrd2dir"
     chmod 755 $olsrd2dir""olsrd2  >>$log 2>>$log
     #restart daemon!
     #stop running daemon
-    ps aux | grep '$olsrd2dir""olsrd2 -l $olsrd2dir"olsrd2.conf"' | grep -v grep | awk '{print $2;}' | xargs kill >>$log 2>>$log
+    ps aux | grep $olsrd2dir'olsrd2 -l '$olsrd2dir'olsrd2.conf' | grep -v grep | awk '{print $2;}' | xargs kill >>$log 2>>$log
     sleep 1
     rm -f /var/lock/olsrd2 >>$log 2>>/dev/null
 fi
