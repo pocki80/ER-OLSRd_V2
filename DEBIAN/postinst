@@ -26,6 +26,11 @@ if [ $(cat /config/config.boot | grep -EB3 "^        enable-default-log" | grep 
     docommands="1"
     executecmd4="delete firewall ipv6-name wan_local0xff-6 enable-default-log"
 fi
+if [ $(cat /config/config.boot | grep -B3 "log enable" | grep -c "rule 520") -eq 2 ]; then
+    docommands="1"
+    executecmd5="set firewall ipv6-name lan_out0xff-6 rule 520 log disable"
+    executecmd6="set firewall ipv6-name wan_local0xff-6 rule 520 log disable"
+fi
 
 if [ "$docommands" ]; then
     echo "Executing config commands (Google-DNS, disable-default-logging)" >>$log
