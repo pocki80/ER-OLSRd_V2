@@ -15,8 +15,20 @@ if [ ! -f $olsrd2dir$configfile ] && [ ! -f $olsrd2dir"olsrd2" ] && [ ! -f /conf
         docommands="1"
         executecmd2="set system name-server 2001:4860:4860::8844"
     fi
-    if [ "$docommands" ]; then
-        echo "Adding Google v6-DNS servers to setup..." >>$log
+fi
+
+#
+if [ $(cat /config/config.boot | grep -EB3 "^        enable-default-log" | grep -cE "^    ipv6-name lan_out0xff-6") -eq 1 ]; then
+    docommands="1"
+    executecmd3="delete firewall ipv6-name lan_out0xff-6 enable-default-log"
+fi
+if [ $(cat /config/config.boot | grep -EB3 "^        enable-default-log" | grep -cE "^    ipv6-name wan_local0xff-6") -eq 1 ]; then
+    docommands="1"
+    executecmd4="delete firewall ipv6-name wan_local0xff-6 enable-default-log"
+fi
+
+if [ "$docommands" ]; then
+    echo "Executing config commands (Google-DNS, disable-default-logging)" >>$log
 cmd="/opt/vyatta/sbin/vyatta-cfg-cmd-wrapper"
 tfile=$(mktemp)
 (
@@ -27,6 +39,12 @@ if [ $ret == 0 ] && [ "$executecmd1" ]; then
 fi
 if [ $ret == 0 ] && [ "$executecmd2" ]; then
     $cmd $executecmd2 || ret=1
+fi
+if [ $ret == 0 ] && [ "$executecmd3" ]; then
+    $cmd $executecmd3 || ret=1
+fi
+if [ $ret == 0 ] && [ "$executecmd4" ]; then
+    $cmd $executecmd4 || ret=1
 fi
 if [ $ret == 0 ]; then
     $cmd commit || ret=1
@@ -41,8 +59,6 @@ ret=$?
 output=$(cat $tfile)
 rm -f $tfile
 echo $output >> $log
-
-    fi
 fi
 
 #enable autostart - only on "plain install" and olsr-v1/v6 is not running
