@@ -114,8 +114,10 @@ if [ "$restart" ]; then
     sleep 1
 fi
 
-# start olsrd2, only if enabled and an v6-address is assigned somewhere
-if [ $(ip -6 addr show lo | grep global | wc -l) != "0" ] && [ -f /config/scripts/post-config.d/startolsrd2.sh ]; then
+# start olsrd2, only if enabled and an v6-address is assigned somewhere and not yet running
+if [ $(ip -6 addr show lo | grep global | wc -l) != "0" ] &&
+   [ -f /config/scripts/post-config.d/startolsrd2.sh ] &&
+   [ $(ps aux | grep $olsrd2dir'olsrd2 -l '$olsrd2dir'olsrd2.conf' | grep -vc grep) -eq 0 ]; then
     echo "fire up olsrd2 daemon..." >>$log
     $olsrd2dir""olsrd2 -l $olsrd2dir"olsrd2.conf" >>$log 2>>$log
 fi
