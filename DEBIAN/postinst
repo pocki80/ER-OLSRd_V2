@@ -5,6 +5,8 @@ olsrd2dir="/config/olsrd2/"
 log="/var/log/0xffolsrd2.log"
 configfile="olsrd2.conf"
 
+echo "starting olsrd2.pkg postinstall..." >>$log
+
 # add google v6 dns on plain install
 if [ ! -f $olsrd2dir$configfile ] && [ ! -f $olsrd2dir"olsrd2" ] && [ ! -f /config/scripts/post-config.d/startolsrd2.sh ]; then
     if [ $(grep -E "^    name-server 2001:4860:4860::8888" /config/config.boot | wc -l) == "0" ]; then
@@ -114,4 +116,5 @@ if [ $(ip -6 addr show lo | grep global | wc -l) != "0" ] &&
     $olsrd2dir""olsrd2 -l $olsrd2dir"olsrd2.conf" >>$log 2>>$log
 fi
 
+echo "done olsrd2.pkg postinstall." >>$log
 exit 0
