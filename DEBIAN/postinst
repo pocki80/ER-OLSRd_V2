@@ -35,7 +35,7 @@ if [ $(grep -Ec "^        port-group WebServices0xFF " /config/config.boot) -eq 
 fi
 
 if [ ${#commandlist[@]} \> 0 ]; then
-    echo "Executing config commands (Google-DNS, disable-default-logging)" >>$log
+    echo "Executing config commands:" >>$log
 cmd="/opt/vyatta/sbin/vyatta-cfg-cmd-wrapper"
 tfile=$(mktemp)
 (
