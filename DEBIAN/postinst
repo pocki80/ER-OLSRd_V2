@@ -8,55 +8,47 @@ configfile="olsrd2.conf"
 # add google v6 dns on plain install
 if [ ! -f $olsrd2dir$configfile ] && [ ! -f $olsrd2dir"olsrd2" ] && [ ! -f /config/scripts/post-config.d/startolsrd2.sh ]; then
     if [ $(grep -E "^    name-server 2001:4860:4860::8888" /config/config.boot | wc -l) == "0" ]; then
-        docommands="1"
-        executecmd1="set system name-server 2001:4860:4860::8888"
+        commandlist[${#commandlist[@]}]="set system name-server 2001:4860:4860::8888"
     fi
     if [ $(grep -E "^    name-server 2001:4860:4860::8844" /config/config.boot | wc -l) == "0" ]; then
-        docommands="1"
-        executecmd2="set system name-server 2001:4860:4860::8844"
+        commandlist[${#commandlist[@]}]="set system name-server 2001:4860:4860::8844"
     fi
 fi
 
 # disable ipv6-firewall logging if enabled
 if [ $(cat /config/config.boot | grep -EB3 "^        enable-default-log" | grep -cE "^    ipv6-name lan_out0xff-6") -eq 1 ]; then
-    docommands="1"
-    executecmd3="delete firewall ipv6-name lan_out0xff-6 enable-default-log"
+    commandlist[${#commandlist[@]}]="delete firewall ipv6-name lan_out0xff-6 enable-default-log"
 fi
 if [ $(cat /config/config.boot | grep -EB3 "^        enable-default-log" | grep -cE "^    ipv6-name wan_local0xff-6") -eq 1 ]; then
-    docommands="1"
-    executecmd4="delete firewall ipv6-name wan_local0xff-6 enable-default-log"
+    commandlist[${#commandlist[@]}]="delete firewall ipv6-name wan_local0xff-6 enable-default-log"
 fi
 if [ $(cat /config/config.boot | grep -B3 "log enable" | grep -c "rule 520") -eq 2 ]; then
-    docommands="1"
-    executecmd5="set firewall ipv6-name lan_out0xff-6 rule 520 log disable"
-    executecmd6="set firewall ipv6-name wan_local0xff-6 rule 520 log disable"
+    commandlist[${#commandlist[@]}]="set firewall ipv6-name lan_out0xff-6 rule 520 log disable"
+    commandlist[${#commandlist[@]}]="set firewall ipv6-name wan_local0xff-6 rule 520 log disable"
+fi
+# insert new ports to portgroup
+if [ $(grep -Ec "^        port-group WebServices0xFF " /config/config.boot) -eq 1 ]; then
+    [ $(grep -EA20 "^        port-group WebServices0xFF " /config/config.boot | grep -Ec "^            port 2006$") -eq 0 ]  && commandlist[${#commandlist[@]}]="set firewall group port-group WebServices0xFF port 2006"
+    [ $(grep -EA20 "^        port-group WebServices0xFF " /config/config.boot | grep -Ec "^            port 2007$") -eq 0 ]  && commandlist[${#commandlist[@]}]="set firewall group port-group WebServices0xFF port 2007"
+    [ $(grep -EA20 "^        port-group WebServices0xFF " /config/config.boot | grep -Ec "^            port 8000$") -eq 0 ]  && commandlist[${#commandlist[@]}]="set firewall group port-group WebServices0xFF port 8000"
+    [ $(grep -EA20 "^        port-group WebServices0xFF " /config/config.boot | grep -Ec "^            port 10443$") -eq 0 ] && commandlist[${#commandlist[@]}]="set firewall group port-group WebServices0xFF port 10443"
 fi
 
-if [ "$docommands" ]; then
+if [ ${#commandlist[@]} \> 0 ]; then
     echo "Executing config commands (Google-DNS, disable-default-logging)" >>$log
 cmd="/opt/vyatta/sbin/vyatta-cfg-cmd-wrapper"
 tfile=$(mktemp)
 (
 $cmd begin
 ret=0
-if [ $ret == 0 ] && [ "$executecmd1" ]; then
-    $cmd $executecmd1 || ret=1
-fi
-if [ $ret == 0 ] && [ "$executecmd2" ]; then
-    $cmd $executecmd2 || ret=1
-fi
-if [ $ret == 0 ] && [ "$executecmd3" ]; then
-    $cmd $executecmd3 || ret=1
-fi
-if [ $ret == 0 ] && [ "$executecmd4" ]; then
-    $cmd $executecmd4 || ret=1
-fi
-if [ $ret == 0 ] && [ "$executecmd5" ]; then
-    $cmd $executecmd5 || ret=1
-fi
-if [ $ret == 0 ] && [ "$executecmd6" ]; then
-    $cmd $executecmd6 || ret=1
-fi
+for executecmd in "${commandlist[@]}"; do
+    if [ $ret == 0 ]; then
+        echo "--execute: "$executecmd >>$log
+        $cmd $executecmd || ret=1
+    else
+        echo "--skipped: "$executecmd >>$log
+    fi
+done
 if [ $ret == 0 ]; then
     $cmd commit || ret=1
 fi
