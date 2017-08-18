@@ -76,6 +76,14 @@ fi
 # establish default configfile if config not already there
 if [ ! -f $olsrd2dir$configfile ] && [ -f $olsrd2dir"olsrd2_default.conf" ]; then
     cp $olsrd2dir"olsrd2_default.conf" $olsrd2dir$configfile >>$log 2>>$log
+elif [ $(grep -c "l2default rx_bitrate 10000000" /config/olsrd2/olsrd2.conf) -eq 0 ]; then
+    # add default rx_bitrate=10M to an existing config
+    linenumber=$(($(grep -inE -m 4 "\[interface=br.\]" $olsrd2dir$configfile | tail -n 1 | awk -F: {'print $1'})+1))
+    sed -i $linenumber'i\
+#set default linkspeed to 10M (default 128k)\
+l2default rx_bitrate 10000000\
+' /config/olsrd2/olsrd2.conf 2>>$log
+    restart=1
 fi
 
 #check for olsrd2 version
@@ -90,8 +98,8 @@ elif [ $(sha1sum $olsrd2dir""olsrd2 | awk {'print $1'}) != $(sha1sum $olsrd2dir"
     #restart daemon!
     #stop running daemon
     ps aux | grep $olsrd2dir'olsrd2 -l '$olsrd2dir'olsrd2.conf' | grep -v grep | awk '{print $2;}' | xargs kill >>$log 2>>$log
-    sleep 1
-    rm -f /var/lock/olsrd2 >>$log 2>>/dev/null
+elif [ "$restart" ]
+    ps aux | grep $olsrd2dir'olsrd2 -l '$olsrd2dir'olsrd2.conf' | grep -v grep | awk '{print $2;}' | xargs kill >>$log 2>>$log
 fi
 
 rm -f $olsrd2dir"olsrd2_inst" >>$log 2>>$log
@@ -99,6 +107,8 @@ rm -f $olsrd2dir"olsrd2_inst" >>$log 2>>$log
 # start olsrd2, only if enabled and an v6-address is assigned somewhere
 if [ $(ip -6 addr show lo | grep global | wc -l) != "0" ] && [ -f /config/scripts/post-config.d/startolsrd2.sh ]; then
     #fire up olsrd2 daemon
+    sleep 1
+    rm -f /var/lock/olsrd2 >>$log 2>>/dev/null
     $olsrd2dir""olsrd2 -l $olsrd2dir"olsrd2.conf" >>$log 2>>$log
 fi
 
