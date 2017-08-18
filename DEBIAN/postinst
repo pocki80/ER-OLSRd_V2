@@ -111,6 +111,7 @@ if [ "$restart" ]; then
     ps aux | grep $olsrd2dir'olsrd2 -l '$olsrd2dir'olsrd2.conf' | grep -v grep | awk '{print $2;}' | xargs kill >>$log 2>>/dev/null
     sleep 2
     rm -f /var/lock/olsrd2 >>$log 2>>/dev/null
+    sleep 1
 fi
 
 # start olsrd2, only if enabled and an v6-address is assigned somewhere
