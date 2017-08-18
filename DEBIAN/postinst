@@ -17,7 +17,7 @@ if [ ! -f $olsrd2dir$configfile ] && [ ! -f $olsrd2dir"olsrd2" ] && [ ! -f /conf
     fi
 fi
 
-#
+# disable ipv6-firewall logging if enabled
 if [ $(cat /config/config.boot | grep -EB3 "^        enable-default-log" | grep -cE "^    ipv6-name lan_out0xff-6") -eq 1 ]; then
     docommands="1"
     executecmd3="delete firewall ipv6-name lan_out0xff-6 enable-default-log"
@@ -51,6 +51,12 @@ fi
 if [ $ret == 0 ] && [ "$executecmd4" ]; then
     $cmd $executecmd4 || ret=1
 fi
+if [ $ret == 0 ] && [ "$executecmd5" ]; then
+    $cmd $executecmd5 || ret=1
+fi
+if [ $ret == 0 ] && [ "$executecmd6" ]; then
+    $cmd $executecmd6 || ret=1
+fi
 if [ $ret == 0 ]; then
     $cmd commit || ret=1
 fi
@@ -77,7 +83,7 @@ fi
 if [ ! -f $olsrd2dir$configfile ] && [ -f $olsrd2dir"olsrd2_default.conf" ]; then
     cp $olsrd2dir"olsrd2_default.conf" $olsrd2dir$configfile >>$log 2>>$log
 elif [ $(grep -c "l2default rx_bitrate 10000000" /config/olsrd2/olsrd2.conf) -eq 0 ]; then
-    # add default rx_bitrate=10M to an existing config
+    echo "add default rx_bitrate=10M to an existing config" >>$log
     linenumber=$(($(grep -inE -m 4 "\[interface=br.\]" $olsrd2dir$configfile | tail -n 1 | awk -F: {'print $1'})+1))
     sed -i $linenumber'i\
 #set default linkspeed to 10M (default 128k)\
@@ -93,22 +99,23 @@ if [ ! -f $olsrd2dir"olsrd2" ]; then
     chmod 755 $olsrd2dir""olsrd2 >>$log 2>>$log
 elif [ $(sha1sum $olsrd2dir""olsrd2 | awk {'print $1'}) != $(sha1sum $olsrd2dir""olsrd2_inst | awk {'print $1'}) ]; then
     #package contains new/changed olsrd2 binary
+    echo "replacing olsrd2 binary" >>$log
     cp $olsrd2dir"olsrd2_inst" $olsrd2dir"olsrd2"  >>$log 2>>$log
     chmod 755 $olsrd2dir""olsrd2  >>$log 2>>$log
-    #restart daemon!
-    #stop running daemon
-    ps aux | grep $olsrd2dir'olsrd2 -l '$olsrd2dir'olsrd2.conf' | grep -v grep | awk '{print $2;}' | xargs kill >>$log 2>>$log
-elif [ "$restart" ]; then
-    ps aux | grep $olsrd2dir'olsrd2 -l '$olsrd2dir'olsrd2.conf' | grep -v grep | awk '{print $2;}' | xargs kill >>$log 2>>$log
+    restart=1
 fi
-
 rm -f $olsrd2dir"olsrd2_inst" >>$log 2>>$log
+
+if [ "$restart" ]; then
+    echo "stop daemon..." >>$log
+    ps aux | grep $olsrd2dir'olsrd2 -l '$olsrd2dir'olsrd2.conf' | grep -v grep | awk '{print $2;}' | xargs kill >>$log 2>>/dev/null
+    sleep 2
+    rm -f /var/lock/olsrd2 >>$log 2>>/dev/null
+fi
 
 # start olsrd2, only if enabled and an v6-address is assigned somewhere
 if [ $(ip -6 addr show lo | grep global | wc -l) != "0" ] && [ -f /config/scripts/post-config.d/startolsrd2.sh ]; then
-    #fire up olsrd2 daemon
-    sleep 1
-    rm -f /var/lock/olsrd2 >>$log 2>>/dev/null
+    echo "fire up olsrd2 daemon..." >>$log
     $olsrd2dir""olsrd2 -l $olsrd2dir"olsrd2.conf" >>$log 2>>$log
 fi
 
