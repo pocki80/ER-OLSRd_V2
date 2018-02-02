@@ -8,9 +8,9 @@ echo "Starting olsrd2..."
 
 echo "Retrieving IF and Link info..."
 sleep 2
-echo /nhdpinfo head if_addr | nc localhost 2009
-echo /nhdpinfo if_addr | nc localhost 2009
+echo /nhdpinfo head if_addr | nc 127.0.0.1 2009
+echo /nhdpinfo if_addr | nc 127.0.0.1 2009
 echo ""
-echo /nhdpinfo head link_addr | nc localhost 2009
-echo /nhdpinfo link_addr | nc localhost 2009
+echo /nhdpinfo head link_addr | nc 127.0.0.1 2009
+echo /nhdpinfo link_addr | nc 127.0.0.1 2009
 echo ""
