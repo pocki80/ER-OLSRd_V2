@@ -33,6 +33,7 @@ if [ $(grep -Ec "^        port-group WebServices0xFF " /config/config.boot) -eq 
     [ $(grep -EA20 "^        port-group WebServices0xFF " /config/config.boot | grep -Ec "^            port 2006$") -eq 0 ]  && commandlist[${#commandlist[@]}]="set firewall group port-group WebServices0xFF port 2006"
     [ $(grep -EA20 "^        port-group WebServices0xFF " /config/config.boot | grep -Ec "^            port 2007$") -eq 0 ]  && commandlist[${#commandlist[@]}]="set firewall group port-group WebServices0xFF port 2007"
     [ $(grep -EA20 "^        port-group WebServices0xFF " /config/config.boot | grep -Ec "^            port 8000$") -eq 0 ]  && commandlist[${#commandlist[@]}]="set firewall group port-group WebServices0xFF port 8000"
+    [ $(grep -EA20 "^        port-group WebServices0xFF " /config/config.boot | grep -Ec "^            port 8080$") -eq 0 ]  && commandlist[${#commandlist[@]}]="set firewall group port-group WebServices0xFF port 8080"
     [ $(grep -EA20 "^        port-group WebServices0xFF " /config/config.boot | grep -Ec "^            port 10443$") -eq 0 ] && commandlist[${#commandlist[@]}]="set firewall group port-group WebServices0xFF port 10443"
 fi
 
@@ -86,6 +87,26 @@ l2default rx_bitrate 10000000\
     restart=1
 fi
 
+# add http-acl if missing
+if [ $(sed -e 's/#.*$//' -e '/^[ \t]*$/d' $olsrd2dir$configfile | sed -n '/\[http\]/,/\[/p' | grep -ci acl) -eq 0 ]; then
+    echo "add http-accesslist to an existing config" >>$log
+    linenumber=$(($(sed -n '/^[ \t]*\[http\]/,/\[/{=;p}' $olsrd2dir$configfile | sed -e '$!N;s/\n/:/' | grep -E "\[http\]|#acl" | tail -1 | cut -d":" -f1)+1))
+    sed -i $linenumber'i\
+acl default_reject\
+acl first_reject\
+acl 127.0.0.1\
+acl 10.0.0.0/8\
+acl 172.16.0.0/12\
+acl 192.168.0.0/24\
+acl 78.41.112.0/21\
+acl 193.238.156.0/22\
+acl 185.194.20.0/22\
+acl ::1\
+acl 2a02:60::/29\
+' $olsrd2dir$configfile 2>>$log
+    restart=1
+fi
+
 #check for olsrd2 version
 if [ ! -f $olsrd2dir"olsrd2" ]; then
     #there is no previous olsrd2
@@ -108,7 +129,7 @@ if [ "$restart" ]; then
     sleep 1
 fi
 
-# start olsrd2, only if enabled and an v6-address is assigned somewhere and not yet running
+# start olsrd2, only if enabled and an ipv6-address is assigned somewhere and not yet running
 if [ $(ip -6 addr show lo | grep global | wc -l) != "0" ] &&
    [ -f /config/scripts/post-config.d/startolsrd2.sh ] &&
    [ $(ps aux | grep $olsrd2dir'olsrd2 -l '$olsrd2dir'olsrd2.conf' | grep -vc grep) -eq 0 ]; then
