@@ -1,0 +1,9 @@
+#!/bin/sh
+#pre-remove
+
+olsrd2dir="/config/olsrd2/"
+log="/var/log/0xffolsrd2.log"
+
+kill $(pgrep -x olsrd2)
+
+exit 0
